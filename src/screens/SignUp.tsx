@@ -1,3 +1,7 @@
+import { useCallback } from 'react';
+
+import { useNavigation } from '@react-navigation/native';
+
 import { Center, Heading, Image, ScrollView, Text, VStack } from 'native-base';
 
 import LogoSvg from '@assets/logo.svg';
@@ -7,20 +11,22 @@ import { Input } from '@components/Input';
 import { Button } from '@components/Button';
 
 export function SignUpScreen() {
+  const navigation = useNavigation();
+
+  const handleGoBackNavigation = useCallback(() => {
+    navigation.goBack();
+  }, [navigation]);
+
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
     >
-      <VStack
-        flex={1}
-        backgroundColor="gray.700"
-        paddingX={10}
-        paddingBottom={14}
-      >
+      <VStack flex={1} paddingX={10} paddingBottom={14}>
         <Image
           source={BackgroundImg}
+          defaultSource={BackgroundImg}
           alt="Pessoas treinando"
           resizeMode="contain"
           position="absolute"
@@ -57,7 +63,12 @@ export function SignUpScreen() {
           <Button title="Criar e acessar" />
         </Center>
 
-        <Button title="Voltar para o login" variant="outline" marginTop={24} />
+        <Button
+          title="Voltar para o login"
+          variant="outline"
+          marginTop={24}
+          onPress={handleGoBackNavigation}
+        />
       </VStack>
     </ScrollView>
   );

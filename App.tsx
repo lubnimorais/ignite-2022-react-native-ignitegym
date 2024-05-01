@@ -8,8 +8,7 @@ import {
 
 import { NativeBaseProvider } from 'native-base';
 
-// import { SignInScreen } from '@screens/SignIn';
-import { SignUpScreen } from '@screens/SignUp';
+import { Routes } from './src/routes';
 
 import { Loading } from '@components/Loading';
 
@@ -29,7 +28,7 @@ export default function App() {
         translucent
       />
 
-      {fontsLoaded ? <SignUpScreen /> : <Loading />}
+      {fontsLoaded ? <Routes /> : <Loading />}
     </NativeBaseProvider>
   );
 }
