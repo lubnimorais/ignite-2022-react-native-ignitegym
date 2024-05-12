@@ -22,7 +22,7 @@ export function ExerciseCard({ ...rest }: IExerciseCardProps) {
           height={16}
           source={{ uri: 'https://github.com/lubnimorais.png' }}
           alt="Imagem do exercício"
-          resizeMode="center"
+          resizeMode="cover"
           rounded="md"
           marginRight={4}
         />

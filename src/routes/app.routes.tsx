@@ -10,7 +10,6 @@ import {
 import HomeSvg from '@assets/home.svg';
 import HistorySvg from '@assets/history.svg';
 import ProfileSvg from '@assets/profile.svg';
-import ExerciseSvg from '@assets/repetitions.svg';
 
 import { HomeScreen } from '@screens/Home';
 import { ExerciseScreen } from '@screens/Exercise';
@@ -62,6 +61,7 @@ export function AppRoutes() {
           ),
         }}
       />
+
       <Screen
         name="historyScreen"
         component={HistoryScreen}
@@ -71,6 +71,7 @@ export function AppRoutes() {
           ),
         }}
       />
+
       <Screen
         name="profileScreen"
         component={ProfileScreen}
@@ -80,6 +81,7 @@ export function AppRoutes() {
           ),
         }}
       />
+
       <Screen
         name="exerciseScreen"
         component={ExerciseScreen}

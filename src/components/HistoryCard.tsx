@@ -12,8 +12,13 @@ export function HistoryCard() {
       marginBottom={3}
       rounded="md"
     >
-      <VStack marginRight={5}>
-        <Heading fontSize="md" color="white" textTransform="capitalize">
+      <VStack flex={1} marginRight={5}>
+        <Heading
+          fontSize="md"
+          color="white"
+          textTransform="capitalize"
+          numberOfLines={1}
+        >
           Costas
         </Heading>
 

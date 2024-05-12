@@ -1,6 +1,10 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+
+import { useNavigation } from '@react-navigation/native';
 
 import { FlatList, HStack, Heading, Text, VStack } from 'native-base';
+
+import { IAppNavigatorRoutesProps } from '@routes/app.routes';
 
 import { HomeHeader } from '@components/HomeHeader';
 import { Group } from '@components/Group';
@@ -21,6 +25,14 @@ export function HomeScreen() {
     'Levantamento terra',
   ]);
 
+  const navigation = useNavigation<IAppNavigatorRoutesProps>();
+
+  // FUNCTIONS
+  const handleOpenExerciseDetails = useCallback(() => {
+    navigation.navigate('exerciseScreen');
+  }, [navigation]);
+  // END FUNCTIONS
+
   return (
     <VStack flex={1}>
       <HomeHeader />
@@ -32,6 +44,7 @@ export function HomeScreen() {
         showsHorizontalScrollIndicator={false}
         _contentContainerStyle={{ paddingX: 8 }}
         marginY={10}
+        minHeight={10}
         maxHeight={10}
         renderItem={({ item: group }) => (
           <Group
@@ -62,7 +75,9 @@ export function HomeScreen() {
           keyExtractor={(item) => item}
           showsVerticalScrollIndicator={false}
           _contentContainerStyle={{ paddingBottom: 20 }}
-          renderItem={({ item: exercise }) => <ExerciseCard />}
+          renderItem={({ item: exercise }) => (
+            <ExerciseCard onPress={handleOpenExerciseDetails} />
+          )}
         />
       </VStack>
     </VStack>
