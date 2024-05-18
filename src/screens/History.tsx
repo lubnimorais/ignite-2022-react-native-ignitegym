@@ -31,6 +31,7 @@ export function HistoryScreen() {
         }
         renderSectionHeader={({ section }) => (
           <Heading
+            fontFamily="heading"
             fontSize="md"
             color="gray.200"
             marginTop={10}

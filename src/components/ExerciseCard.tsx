@@ -28,7 +28,7 @@ export function ExerciseCard({ ...rest }: IExerciseCardProps) {
         />
 
         <VStack flex={1}>
-          <Heading fontSize="lg" color="white">
+          <Heading fontFamily="heading" fontSize="lg" color="white">
             Remada unilateral
           </Heading>
 

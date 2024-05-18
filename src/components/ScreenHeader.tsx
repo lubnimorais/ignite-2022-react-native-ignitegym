@@ -7,7 +7,7 @@ interface IScreenHeaderProps {
 export function ScreenHeader({ title }: IScreenHeaderProps) {
   return (
     <Center backgroundColor="gray.600" paddingTop={16} paddingBottom={6}>
-      <Heading fontSize="xl" color="gray.100">
+      <Heading fontFamily="heading" fontSize="xl" color="gray.100">
         {title}
       </Heading>
     </Center>

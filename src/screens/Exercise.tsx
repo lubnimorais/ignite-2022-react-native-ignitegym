@@ -44,7 +44,12 @@ export function ExerciseScreen() {
           marginTop={4}
           marginBottom={8}
         >
-          <Heading flexShrink={1} fontSize="lg" color="gray.100">
+          <Heading
+            flexShrink={1}
+            fontFamily="heading"
+            fontSize="lg"
+            color="gray.100"
+          >
             Puxada frontal Puxada frontal Puxada frontal
           </Heading>
 

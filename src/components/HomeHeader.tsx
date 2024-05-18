@@ -26,7 +26,7 @@ export function HomeHeader() {
           Olá,
         </Text>
 
-        <Heading fontSize="md" color="gray.100">
+        <Heading fontFamily="heading" fontSize="md" color="gray.100">
           Lubni Morais
         </Heading>
       </VStack>

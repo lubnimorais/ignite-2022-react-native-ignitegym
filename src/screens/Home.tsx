@@ -61,7 +61,7 @@ export function HomeScreen() {
 
       <VStack flex={1} paddingX={8}>
         <HStack justifyContent="space-between" marginBottom={5}>
-          <Heading fontSize="md" color="gray.200">
+          <Heading fontFamily="heading" fontSize="md" color="gray.200">
             Exercícios
           </Heading>
 

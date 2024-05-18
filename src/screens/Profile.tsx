@@ -52,15 +52,17 @@ export function ProfileScreen() {
           photoSelected.assets[0].uri,
         );
 
-        if (photoInfo.size) {
-          const photoSizeMegabyte = photoInfo.size / 1024 / 1024;
+        if (photoInfo.exists) {
+          if (photoInfo.size) {
+            const photoSizeMegabyte = photoInfo.size / 1024 / 1024;
 
-          if (photoSizeMegabyte > 5)
-            return toast.show({
-              title: 'Essa imagem é muito grande. Escolha uma de até 5MB',
-              placement: 'top',
-              backgroundColor: 'red.500',
-            });
+            if (photoSizeMegabyte > 5)
+              return toast.show({
+                title: 'Essa imagem é muito grande. Escolha uma de até 5MB',
+                placement: 'top',
+                backgroundColor: 'red.500',
+              });
+          }
         }
 
         setUserPhoto(photoSelected.assets[0].uri);
@@ -117,7 +119,12 @@ export function ProfileScreen() {
         </Center>
 
         <VStack paddingX={10} marginTop={12} marginBottom={9}>
-          <Heading fontSize="md" color="gray.200" marginBottom={2}>
+          <Heading
+            fontFamily="heading"
+            fontSize="md"
+            color="gray.200"
+            marginBottom={2}
+          >
             Alterar Senha
           </Heading>
 
