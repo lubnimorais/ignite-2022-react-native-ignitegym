@@ -2,13 +2,25 @@ import { useCallback } from 'react';
 
 import { useNavigation } from '@react-navigation/native';
 
-import { Center, Heading, Image, ScrollView, Text, VStack } from 'native-base';
+import {
+  Center,
+  Heading,
+  Image,
+  ScrollView,
+  Text,
+  VStack,
+  useToast,
+} from 'native-base';
 
 import { Controller, useForm } from 'react-hook-form';
 
 import { yupResolver } from '@hookform/resolvers/yup';
 
 import * as yup from 'yup';
+
+import { api } from '@services/api';
+
+import { AppError } from '@utils/AppError';
 
 import LogoSvg from '@assets/logo.svg';
 import BackgroundImg from '@assets/background.png';
@@ -39,6 +51,8 @@ const signUpSchema = yup.object({
 export function SignUpScreen() {
   const navigation = useNavigation();
 
+  const toast = useToast();
+
   const {
     control,
     handleSubmit,
@@ -52,9 +66,31 @@ export function SignUpScreen() {
     navigation.goBack();
   }, [navigation]);
 
-  const handleSignUp = useCallback((data: IFormDataProps) => {
-    console.log(data);
-  }, []);
+  const handleSignUp = useCallback(
+    async ({ name, email, password }: IFormDataProps) => {
+      try {
+        const response = await api.post('/users', {
+          name,
+          email,
+          password,
+        });
+
+        console.log(response.data);
+      } catch (error) {
+        const isAppError = error instanceof AppError;
+        const title = isAppError
+          ? error.message
+          : 'Não foi possível criar a conta. Tente novamente mais tarde.';
+
+        toast.show({
+          title,
+          placement: 'top',
+          backgroundColor: 'red.500',
+        });
+      }
+    },
+    [toast],
+  );
 
   // END FUNCTIONS
 
