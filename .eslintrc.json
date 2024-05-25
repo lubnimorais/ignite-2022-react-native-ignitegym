@@ -1,6 +1,7 @@
 {
   "extends": "@rocketseat/eslint-config/react",
   "rules": {
+    "no-useless-catch": "off",
     "camelcase": "off",
     "prettier/prettier": ["error", {
       "printWidth": 80,

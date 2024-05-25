@@ -1,10 +1,28 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { useNavigation } from '@react-navigation/native';
 
-import { Center, Heading, Image, ScrollView, Text, VStack } from 'native-base';
+import {
+  Center,
+  Heading,
+  Image,
+  ScrollView,
+  Text,
+  VStack,
+  useToast,
+} from 'native-base';
 
 import { IAuthNavigatorRoutesProps } from '@routes/auth.routes';
+
+import { Controller, useForm } from 'react-hook-form';
+
+import { yupResolver } from '@hookform/resolvers/yup';
+
+import * as yup from 'yup';
+
+import { useAuth } from '@hooks/auth';
+
+import { AppError } from '@utils/AppError';
 
 import LogoSvg from '@assets/logo.svg';
 import BackgroundImg from '@assets/background.png';
@@ -12,12 +30,64 @@ import BackgroundImg from '@assets/background.png';
 import { Input } from '@components/Input';
 import { Button } from '@components/Button';
 
+type IFormData = {
+  email: string;
+  password: string;
+};
+
+const signInSchema = yup.object({
+  email: yup.string().required('Informe o e-mail.').email('E-mail inválido.'),
+  password: yup
+    .string()
+    .required('Informe a senha.')
+    .min(6, 'A senha deve ter pelo menos 6 dígitos.'),
+});
+
 export function SignInScreen() {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { signIn } = useAuth();
+
   const navigation = useNavigation<IAuthNavigatorRoutesProps>();
+
+  const toast = useToast();
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<IFormData>({
+    resolver: yupResolver(signInSchema),
+  });
 
   const handleNewAccountNavigate = useCallback(() => {
     navigation.navigate('signUpScreen');
   }, [navigation]);
+
+  const handleSignIn = useCallback(
+    async ({ email, password }: IFormData) => {
+      try {
+        setIsLoading(true);
+
+        await signIn({ email, password });
+      } catch (error) {
+        const isAppError = error instanceof AppError;
+
+        const title = isAppError
+          ? error.message
+          : 'Não foi possível entrar. Tente novamente mais tarde.';
+
+        setIsLoading(false);
+
+        toast.show({
+          title,
+          placement: 'top',
+          backgroundColor: 'red.500',
+        });
+      }
+    },
+    [signIn, toast],
+  );
 
   return (
     <ScrollView
@@ -51,15 +121,38 @@ export function SignInScreen() {
             Acesse sua conta
           </Heading>
 
-          <Input
-            placeholder="E-mail"
-            keyboardType="email-address"
-            autoCapitalize="none"
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange } }) => (
+              <Input
+                placeholder="E-mail"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onChangeText={onChange}
+                errorMessage={errors.email?.message}
+              />
+            )}
           />
 
-          <Input placeholder="Senha" secureTextEntry />
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange } }) => (
+              <Input
+                placeholder="Senha"
+                secureTextEntry
+                onChangeText={onChange}
+                errorMessage={errors.password?.message}
+              />
+            )}
+          />
 
-          <Button title="Acessar" />
+          <Button
+            title="Acessar"
+            isLoading={isLoading}
+            onPress={handleSubmit(handleSignIn)}
+          />
         </Center>
 
         <Center marginTop={24}>

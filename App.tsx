@@ -10,6 +10,8 @@ import { NativeBaseProvider } from 'native-base';
 
 import { Routes } from './src/routes';
 
+import { AppProvider } from '@hooks/index';
+
 import { Loading } from '@components/Loading';
 
 import { THEME } from './src/theme';
@@ -28,7 +30,7 @@ export default function App() {
         translucent
       />
 
-      {fontsLoaded ? <Routes /> : <Loading />}
+      <AppProvider>{fontsLoaded ? <Routes /> : <Loading />}</AppProvider>
     </NativeBaseProvider>
   );
 }

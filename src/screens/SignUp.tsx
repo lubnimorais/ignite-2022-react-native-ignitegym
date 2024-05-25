@@ -28,7 +28,7 @@ import BackgroundImg from '@assets/background.png';
 import { Input } from '@components/Input';
 import { Button } from '@components/Button';
 
-type IFormDataProps = {
+type IFormData = {
   name: string;
   email: string;
   password: string;
@@ -57,7 +57,7 @@ export function SignUpScreen() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<IFormDataProps>({
+  } = useForm<IFormData>({
     resolver: yupResolver(signUpSchema),
   });
 
@@ -67,7 +67,7 @@ export function SignUpScreen() {
   }, [navigation]);
 
   const handleSignUp = useCallback(
-    async ({ name, email, password }: IFormDataProps) => {
+    async ({ name, email, password }: IFormData) => {
       try {
         const response = await api.post('/users', {
           name,
