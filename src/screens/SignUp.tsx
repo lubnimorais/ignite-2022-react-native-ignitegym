@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { useNavigation } from '@react-navigation/native';
 
@@ -19,6 +19,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
 import { api } from '@services/api';
+
+import { useAuth } from '@hooks/auth';
 
 import { AppError } from '@utils/AppError';
 
@@ -49,9 +51,11 @@ const signUpSchema = yup.object({
 });
 
 export function SignUpScreen() {
-  const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(false);
 
+  const navigation = useNavigation();
   const toast = useToast();
+  const { signIn } = useAuth();
 
   const {
     control,
@@ -69,14 +73,20 @@ export function SignUpScreen() {
   const handleSignUp = useCallback(
     async ({ name, email, password }: IFormData) => {
       try {
+        setIsLoading(true);
+
         const response = await api.post('/users', {
           name,
           email,
           password,
         });
 
-        console.log(response.data);
+        if (response.status === 201) {
+          await signIn({ email, password });
+        }
       } catch (error) {
+        setIsLoading(false);
+
         const isAppError = error instanceof AppError;
         const title = isAppError
           ? error.message
@@ -89,7 +99,7 @@ export function SignUpScreen() {
         });
       }
     },
-    [toast],
+    [toast, signIn],
   );
 
   // END FUNCTIONS
@@ -188,6 +198,7 @@ export function SignUpScreen() {
           <Button
             title="Criar e acessar"
             onPress={handleSubmit(handleSignUp)}
+            isLoading={isLoading}
           />
         </Center>
 
