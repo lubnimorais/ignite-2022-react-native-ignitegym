@@ -4,9 +4,15 @@ import { HStack, Heading, Icon, Image, Text, VStack } from 'native-base';
 
 import { Entypo } from '@expo/vector-icons';
 
-interface IExerciseCardProps extends TouchableOpacityProps {}
+import { IExerciseDTO } from '@dtos/ExerciseDTO';
 
-export function ExerciseCard({ ...rest }: IExerciseCardProps) {
+import { api } from '@services/api';
+
+interface IExerciseCardProps extends TouchableOpacityProps {
+  exercise: IExerciseDTO;
+}
+
+export function ExerciseCard({ exercise, ...rest }: IExerciseCardProps) {
   return (
     <TouchableOpacity {...rest}>
       <HStack
@@ -20,7 +26,9 @@ export function ExerciseCard({ ...rest }: IExerciseCardProps) {
         <Image
           width={16}
           height={16}
-          source={{ uri: 'https://github.com/lubnimorais.png' }}
+          source={{
+            uri: `${api.defaults.baseURL}/exercise/thumb/${exercise.thumb}`,
+          }}
           alt="Imagem do exercício"
           resizeMode="cover"
           rounded="md"
@@ -29,11 +37,11 @@ export function ExerciseCard({ ...rest }: IExerciseCardProps) {
 
         <VStack flex={1}>
           <Heading fontFamily="heading" fontSize="lg" color="white">
-            Remada unilateral
+            {exercise.name}
           </Heading>
 
           <Text fontSize="sm" color="gray.200" marginTop={1} numberOfLines={2}>
-            3 séries x 12 repetições
+            {exercise.series} séries x {exercise.repetitions} repetições
           </Text>
         </VStack>
 

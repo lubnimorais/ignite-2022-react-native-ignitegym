@@ -20,7 +20,7 @@ type IAppRoutes = {
   homeScreen: undefined;
   historyScreen: undefined;
   profileScreen: undefined;
-  exerciseScreen: undefined;
+  exerciseScreen: { exerciseId: string };
 };
 
 export type IAppNavigatorRoutesProps = BottomTabNavigationProp<IAppRoutes>;
