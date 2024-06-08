@@ -77,7 +77,7 @@ export function ExerciseScreen() {
     } finally {
       setIsLoading(false);
     }
-  }, [toast, exerciseId]);
+  }, [exerciseId]);
 
   const handleExerciseHistoryRegister = useCallback(async () => {
     try {
