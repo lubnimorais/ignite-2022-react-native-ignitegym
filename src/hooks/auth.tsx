@@ -41,6 +41,7 @@ type IAuthProviderProps = {
 type IAuthContextDataProps = {
   user: IUserDTO;
   isLoadingUserStorageData: boolean;
+  updateUserProfile(userUpdated: IUserDTO): Promise<void>;
   signIn({ email, password }: ICredentials): Promise<void>;
   signOut(): Promise<void>;
 };
@@ -115,6 +116,16 @@ function AuthProvider({ children }: IAuthProviderProps) {
     }
   }, []);
 
+  const updateUserProfile = useCallback(async (userUpdated: IUserDTO) => {
+    try {
+      setUser(userUpdated);
+
+      await storageUserSave(userUpdated);
+    } catch (error) {
+      throw error;
+    }
+  }, []);
+
   const loadUserData = useCallback(async () => {
     try {
       setIsLoadingUserStorageData(true);
@@ -143,6 +154,7 @@ function AuthProvider({ children }: IAuthProviderProps) {
       value={{
         user,
         isLoadingUserStorageData,
+        updateUserProfile,
         signIn,
         signOut,
       }}

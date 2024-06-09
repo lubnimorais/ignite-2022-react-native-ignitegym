@@ -58,7 +58,7 @@ export function HomeScreen() {
         background: 'red.500',
       });
     }
-  }, [toast]);
+  }, []);
 
   const fetchExerciseByGroup = useCallback(async () => {
     try {
@@ -84,7 +84,7 @@ export function HomeScreen() {
     } finally {
       setIsLoading(false);
     }
-  }, [toast, groupSelected]);
+  }, [groupSelected]);
   // END FUNCTIONS
 
   useEffect(() => {

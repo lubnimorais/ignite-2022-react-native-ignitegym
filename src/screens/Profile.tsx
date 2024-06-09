@@ -16,6 +16,18 @@ import {
   useToast,
 } from 'native-base';
 
+import { Controller, useForm } from 'react-hook-form';
+
+import { yupResolver } from '@hookform/resolvers/yup';
+
+import * as yup from 'yup';
+
+import { api } from '@services/api';
+
+import { AppError } from '@utils/AppError';
+
+import { useAuth } from '@hooks/auth';
+
 import { ScreenHeader } from '@components/ScreenHeader';
 import { UserPhoto } from '@components/UserPhoto';
 import { Input } from '@components/Input';
@@ -23,13 +35,58 @@ import { Button } from '@components/Button';
 
 const PHOTO_SIZE = 33;
 
+type IFormDataProps = {
+  name: string;
+  email: string;
+  password: string;
+  old_password: string;
+  confirm_password: string;
+};
+
+const profileSchema = yup.object({
+  name: yup.string().required('Informe o nome'),
+  password: yup
+    .string()
+    .min(6, 'A senha deve ter pelo menos 6 dígitos')
+    .nullable()
+    .transform((value) => value || null),
+  confirm_password: yup
+    .string()
+    .nullable()
+    .transform((value) => value || null)
+    .oneOf([yup.ref('password'), null], 'A confirmação de senha não confere.')
+    .when('password', {
+      is: (field: any) => field,
+      then: (schema) =>
+        schema
+          .nullable()
+          .required('Informe a confirmação da senha.')
+          .transform((value) => value || null),
+    }),
+});
+
 export function ProfileScreen() {
+  const [isUpdateLoading, setIsUpdateLoading] = useState(false);
   const [photoIsLoading, setPhotoIsLoading] = useState(false);
   const [userPhoto, setUserPhoto] = useState(
     'http://github.com/lubnimorais.png',
   );
 
+  const { user, updateUserProfile } = useAuth();
+
   const toast = useToast();
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<IFormDataProps>({
+    defaultValues: {
+      name: user.name,
+      email: user.email,
+    },
+    resolver: yupResolver(profileSchema),
+  });
 
   // FUNCTIONS
   const handleUserPhotoSelect = useCallback(async () => {
@@ -72,7 +129,42 @@ export function ProfileScreen() {
     } finally {
       setPhotoIsLoading(false);
     }
-  }, [toast]);
+  }, []);
+
+  const handleProfileUpdate = useCallback(async (data: IFormDataProps) => {
+    try {
+      setIsUpdateLoading(true);
+
+      const userUpdated = user;
+      userUpdated.name = data.name;
+
+      const response = await api.put('/users', data);
+
+      if (response.status === 200) {
+        await updateUserProfile(userUpdated);
+
+        toast.show({
+          title: 'Perfil atualizado com sucesso',
+          placement: 'top',
+          backgroundColor: 'green.500',
+        });
+      }
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível atualizar os dados. Tente novamente mais tarde.';
+
+      toast.show({
+        title,
+        placement: 'top',
+        backgroundColor: 'red.500',
+      });
+    } finally {
+      setIsUpdateLoading(false);
+    }
+  }, []);
   // END FUNCTIONS
 
   return (
@@ -113,9 +205,32 @@ export function ProfileScreen() {
             </Text>
           </TouchableOpacity>
 
-          <Input backgroundColor="gray.600" placeholder="Nome" />
+          <Controller
+            control={control}
+            name="name"
+            render={({ field: { value, onChange } }) => (
+              <Input
+                backgroundColor="gray.600"
+                placeholder="Nome"
+                value={value}
+                onChangeText={onChange}
+                errorMessage={errors.name?.message}
+              />
+            )}
+          />
 
-          <Input backgroundColor="gray.600" placeholder="E-mail" isDisabled />
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { value } }) => (
+              <Input
+                backgroundColor="gray.600"
+                placeholder="E-mail"
+                isDisabled
+                value={value}
+              />
+            )}
+          />
         </Center>
 
         <VStack paddingX={10} marginTop={12} marginBottom={9}>
@@ -128,25 +243,53 @@ export function ProfileScreen() {
             Alterar Senha
           </Heading>
 
-          <Input
-            backgroundColor="gray.600"
-            placeholder="Senha antiga"
-            secureTextEntry
+          <Controller
+            control={control}
+            name="old_password"
+            render={({ field: { onChange } }) => (
+              <Input
+                backgroundColor="gray.600"
+                placeholder="Senha antiga"
+                secureTextEntry
+                onChangeText={onChange}
+              />
+            )}
           />
 
-          <Input
-            backgroundColor="gray.600"
-            placeholder="Nova senha"
-            secureTextEntry
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange } }) => (
+              <Input
+                backgroundColor="gray.600"
+                placeholder="Nova senha"
+                secureTextEntry
+                onChangeText={onChange}
+                errorMessage={errors.password?.message}
+              />
+            )}
           />
 
-          <Input
-            backgroundColor="gray.600"
-            placeholder="Confirme nova senha"
-            secureTextEntry
+          <Controller
+            control={control}
+            name="confirm_password"
+            render={({ field: { onChange } }) => (
+              <Input
+                backgroundColor="gray.600"
+                placeholder="Confirme nova senha"
+                secureTextEntry
+                onChangeText={onChange}
+                errorMessage={errors.confirm_password?.message}
+              />
+            )}
           />
 
-          <Button title="Atualizar" marginTop={4} />
+          <Button
+            title="Atualizar"
+            marginTop={4}
+            onPress={handleSubmit(handleProfileUpdate)}
+            isLoading={isUpdateLoading}
+          />
         </VStack>
       </ScrollView>
     </VStack>
