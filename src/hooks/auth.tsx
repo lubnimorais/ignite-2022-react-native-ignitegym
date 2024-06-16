@@ -149,6 +149,15 @@ function AuthProvider({ children }: IAuthProviderProps) {
     loadUserData();
   }, [loadUserData]);
 
+  useEffect(() => {
+    const subscribe = api.registerInterceptTokenManager(signOut);
+
+    // LIMPEZA DE MEMÓRIA
+    return () => {
+      subscribe();
+    };
+  }, [signOut]);
+
   return (
     <AuthContext.Provider
       value={{
