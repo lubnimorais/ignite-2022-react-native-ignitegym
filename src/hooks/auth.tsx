@@ -66,12 +66,12 @@ function AuthProvider({ children }: IAuthProviderProps) {
   );
 
   const storageUserAndTokenSave = useCallback(
-    async (userData: IUserDTO, token: string) => {
+    async (userData: IUserDTO, token: string, refresh_token: string) => {
       try {
         setIsLoadingUserStorageData(true);
 
         await storageUserSave(userData);
-        await storageAuthTokenSave(token);
+        await storageAuthTokenSave({ token, refresh_token });
       } catch (error) {
         throw error;
       } finally {
@@ -89,7 +89,11 @@ function AuthProvider({ children }: IAuthProviderProps) {
         if (response.status === 201) {
           const userData = response.data as IAuthUserResponse;
 
-          await storageUserAndTokenSave(userData.user, userData.token);
+          await storageUserAndTokenSave(
+            userData.user,
+            userData.token,
+            userData.refresh_token,
+          );
           await userAndTokenUpdate(userData.user, userData.token);
         }
       } catch (error) {
@@ -131,7 +135,7 @@ function AuthProvider({ children }: IAuthProviderProps) {
       setIsLoadingUserStorageData(true);
 
       const userLogged = await storageUserGet();
-      const token = await storageAuthTokenGet();
+      const { token } = await storageAuthTokenGet();
 
       if (userLogged && token) {
         // setUser(userLogged);
