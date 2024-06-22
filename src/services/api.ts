@@ -1,7 +1,10 @@
 import axios, { AxiosError, AxiosInstance } from 'axios';
 
 import { AppError } from '@utils/AppError';
-import { storageAuthTokenGet } from '@storage/storageAuthToken';
+import {
+  storageAuthTokenGet,
+  storageAuthTokenSave,
+} from '@storage/storageAuthToken';
 
 /**
  * INTERFACE PORQUE NÃO TEMOS ACESSO A FUNÇÃO SIGNOUT
@@ -29,7 +32,7 @@ const api = axios.create({
 }) as IAPIInstanceProps;
 
 // FILA DE ESPERA DAS REQUISIÇÕES
-const failedQueue: IPromiseType[] = [];
+let failedQueue: IPromiseType[] = [];
 let isRefreshing = false;
 
 api.registerInterceptTokenManager = (signOut) => {
@@ -85,6 +88,64 @@ api.registerInterceptTokenManager = (signOut) => {
            * REQUISIÇÕES NO IF ACIMA
            */
           isRefreshing = true;
+
+          return new Promise((resolve, reject) => {
+            try {
+              api
+                .post('/sessions/refresh-token', {
+                  refresh_token,
+                })
+                .then(async (response) => {
+                  const data = response.data;
+
+                  await storageAuthTokenSave({
+                    token: data.token,
+                    refresh_token: data.refresh_token,
+                  });
+
+                  /**
+                   * REENVIANDO AS REQUISIÇÕES
+                   */
+                  if (originalRequestConfig.data) {
+                    originalRequestConfig.data = JSON.parse(
+                      originalRequestConfig.data,
+                    );
+                  }
+
+                  originalRequestConfig.headers = {
+                    Authorization: `Bearer ${data.token}`,
+                  };
+
+                  api.defaults.headers.common.Authorization = `Bearer ${data.token}`;
+
+                  failedQueue.forEach((request) => {
+                    request.onSuccess(data.token);
+                  });
+
+                  resolve(api(originalRequestConfig));
+                });
+            } catch (error: any) {
+              /**
+               * CASO DÊ ERRO PARA OBTER O TOKEN
+               * PECORREMOS A FILA DE REQUISIÇÕES
+               * E INFORMAMOS O ERRO NA REQUEST
+               *
+               */
+              failedQueue.forEach((request) => {
+                request.onFailure(error);
+              });
+
+              /**
+               * DESLOGAMOS O URUÁRIO
+               * E REJEITAMOS A PROMISE
+               */
+              signOut();
+              reject(error);
+            } finally {
+              isRefreshing = false;
+              failedQueue = [];
+            }
+          });
         }
 
         // SE O ERRO NÃO FOR NENHUM ACIMA, FAZEMOS O LOGOUT DO USUÁRIO
